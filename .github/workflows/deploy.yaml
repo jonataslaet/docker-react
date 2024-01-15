@@ -14,6 +14,9 @@ jobs:
           docker build -t cygnetops/react-test -f Dockerfile.dev .
           docker run -e CI=true cygnetops/react-test npm test
 
+      - name: List files before creating deploy.zip
+        run: ls -la
+
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
