@@ -3,28 +3,19 @@ on:
   push:
     branches:
       - main
- 
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build and test
-        run: |
-          docker build -t cygnetops/react-test -f Dockerfile.dev .
-          docker run -e CI=true cygnetops/react-test npm test
-
-      - name: List files before creating deploy.zip
-        run: ls -la
+      - run: docker build -t cygnetops/react-test -f Dockerfile.dev .
+      - run: docker run -e CI=true cygnetops/react-test npm test
 
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to Elastic Beanstalk
+      - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v18
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
@@ -35,4 +26,3 @@ jobs:
           region: us-east-1
           version_label: ${{ github.sha }}
           deployment_package: deploy.zip
-          
